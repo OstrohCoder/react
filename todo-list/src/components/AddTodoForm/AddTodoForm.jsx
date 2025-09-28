@@ -1,13 +1,13 @@
-import { useState } from "react";
-import "./AddTodoForm.css";
+import { useState } from 'react';
+import './AddTodoForm.css';
 
 function AddTodoForm({ onAddTodo }) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onAddTodo(inputValue);
-    setInputValue("");
+    setInputValue('');
   };
 
   return (

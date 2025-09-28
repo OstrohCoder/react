@@ -1,12 +1,12 @@
-import { useState } from "react";
-import "./TodoItem.css";
+import { useState } from 'react';
+import './TodoItem.css';
 
 function TodoItem({ task, onDelete }) {
   const [isCompleted, setIsCompleted] = useState(false);
 
   return (
     <>
-      <li className={`todo-item ${isCompleted ? "completed" : ""}`}>
+      <li className={`todo-item ${isCompleted ? 'completed' : ''}`}>
         <div className="todo-left">
           <input
             type="checkbox"

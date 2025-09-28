@@ -1,7 +1,7 @@
-import { useState } from "react";
-import AddTodoForm from "../AddTodoForm/AddTodoForm";
-import TodoItem from "../TodoItem/TodoItem";
-import "./TodoList.css";
+import { useState } from 'react';
+import AddTodoForm from '../AddTodoForm/AddTodoForm';
+import TodoItem from '../TodoItem/TodoItem';
+import './TodoList.css';
 
 function TodoList() {
   const [todos, setTodos] = useState([]);
@@ -20,11 +20,7 @@ function TodoList() {
       <AddTodoForm onAddTodo={handleAddTodo} />
       <ul className="todo-list">
         {todos.map((todo) => (
-          <TodoItem
-            key={todo.id}
-            task={todo}
-            onDelete={handleDeleteTodo}
-          />
+          <TodoItem key={todo.id} task={todo} onDelete={handleDeleteTodo} />
         ))}
       </ul>
     </>
