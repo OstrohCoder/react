@@ -1,9 +1,11 @@
 import "./TodoItem.css";
 import { useState } from "react";
 
-export default function TodoItem({ todo, onToggle, onDelete }) {
+export default function TodoItem({ todo, onToggle, onDelete, onEdit }) {
   const [completed, setCompleted] = useState(Boolean(todo.completed));
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftTitle, setDraftTitle] = useState(todo.todo);
 
   const handleToggle = async () => {
     const next = !completed;
@@ -18,6 +20,21 @@ export default function TodoItem({ todo, onToggle, onDelete }) {
     }
   };
 
+  const handleEditSave = async () => {
+    const newTitle = draftTitle.trim();
+    if (!newTitle || newTitle === todo.todo) {
+      setIsEditing(false);
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await onEdit(todo.id, newTitle);
+    } finally {
+      setIsSaving(false);
+      setIsEditing(false);
+    }
+  };
+
   return (
     <li className={`todo-item ${completed ? "completed" : ""}`}>
       <label>
@@ -27,9 +44,34 @@ export default function TodoItem({ todo, onToggle, onDelete }) {
           onChange={handleToggle}
           disabled={isSaving}
         />
-        <span>{todo.todo}</span>
+        {isEditing ? (
+          <input
+            value={draftTitle}
+            onChange={(e) => setDraftTitle(e.target.value)}
+            onBlur={handleEditSave}
+            onKeyDown={(e) => e.key === "Enter" && handleEditSave()}
+            disabled={isSaving}
+            autoFocus
+          />
+        ) : (
+          <span>{todo.todo}</span>
+        )}
       </label>
-      <button onClick={() => onDelete(todo.id)}>Delete</button>
+
+      <div className="todo-actions">
+        {isEditing ? (
+          <button onClick={handleEditSave} disabled={isSaving}>
+            Save
+          </button>
+        ) : (
+          <button onClick={() => setIsEditing(true)} disabled={isSaving}>
+            Edit
+          </button>
+        )}
+        <button onClick={() => onDelete(todo.id)} disabled={isSaving}>
+          Delete
+        </button>
+      </div>
     </li>
   );
 }
