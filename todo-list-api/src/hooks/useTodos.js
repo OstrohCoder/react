@@ -7,16 +7,26 @@ function useTodos() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limitPerPage, setLimitPerPage] = useState(10);
+  const [totalTodos, setTotalTodos] = useState(0);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     let cancelled = false;
     async function fetchTodos() {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE}/todos`);
+        const skip = (currentPage - 1) * limitPerPage;
+        const res = await fetch(`${API_BASE}/todos?limit=${limitPerPage}&skip=${skip}`);
         if (!res.ok) throw new Error(`GET /todos failed: ${res.status}`);
         const data = await res.json();
-        if (!cancelled) setTodos(data.todos || []);
+        if (!cancelled) {
+          setTodos(data.todos || []);
+          setTotalTodos(data.total || data.todos?.length || 0);
+        }
       } catch (err) {
         if (!cancelled) setError(err.message || err);
       } finally {
@@ -28,7 +38,22 @@ function useTodos() {
     return () => {
       cancelled = true;
     };
+  }, [currentPage, limitPerPage]);
+
+
+  const goToNextPage = useCallback(() => {
+    setCurrentPage((prev) => prev + 1);
   }, []);
+
+  const goToPrevPage = useCallback(() => {
+    setCurrentPage((prev) => Math.max(1, prev - 1));
+  }, []);
+
+  const changeLimit = useCallback((limit) => {
+    setLimitPerPage(limit);
+    setCurrentPage(1);
+  }, []);
+
 
   const deleteTodo = useCallback(async (id) => {
     setIsLoading(true);
@@ -67,6 +92,28 @@ function useTodos() {
     }
   }, []);
 
+  const editTodoTitle = useCallback(async (id, newTitle) => {
+    if (!newTitle.trim()) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/todos/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ todo: newTitle.trim() }),
+      });
+      if (!res.ok) throw new Error(`PUT /todos/${id} failed: ${res.status}`);
+      const updated = await res.json();
+      setTodos((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, todo: updated.todo } : t))
+      );
+    } catch (err) {
+      setError(err.message || err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const addTodo = useCallback(async (text) => {
     if (!text.trim()) return;
     setIsLoading(true);
@@ -91,14 +138,33 @@ function useTodos() {
     }
   }, []);
 
-  return {
-    todos,
+  const filteredTodos = todos.filter((t) =>
+    t.todo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+    return {
+      
+    todos: filteredTodos,
     isLoading,
     error,
+    
     deleteTodo,
     toggleTodo,
     addTodo,
+    editTodoTitle,
+    
+    searchTerm,
+    setSearchTerm,
+    
+    currentPage,
+    limitPerPage,
+    totalTodos,
+    goToNextPage,
+    goToPrevPage,
+    setLimit: changeLimit,
+
   };
+
 }
 
 export default useTodos;
