@@ -9,7 +9,6 @@ function useTodos() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [limitPerPage, setLimitPerPage] = useState(10);
-  const [totalTodos, setTotalTodos] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -19,27 +18,21 @@ function useTodos() {
       setIsLoading(true);
       setError(null);
       try {
-        const skip = (currentPage - 1) * limitPerPage;
-        const res = await fetch(`${API_BASE}/todos?limit=${limitPerPage}&skip=${skip}`);
+        const res = await fetch(`${API_BASE}/todos?limit=150`);
         if (!res.ok) throw new Error(`GET /todos failed: ${res.status}`);
         const data = await res.json();
-        if (!cancelled) {
-          setTodos(data.todos || []);
-          setTotalTodos(data.total || data.todos?.length || 0);
-        }
+        if (!cancelled) setTodos(data.todos || []);
       } catch (err) {
         if (!cancelled) setError(err.message || err);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
     }
-
     fetchTodos();
     return () => {
       cancelled = true;
     };
-  }, [currentPage, limitPerPage]);
-
+  }, []);
 
   const goToNextPage = useCallback(() => {
     setCurrentPage((prev) => prev + 1);
@@ -53,7 +46,6 @@ function useTodos() {
     setLimitPerPage(limit);
     setCurrentPage(1);
   }, []);
-
 
   const deleteTodo = useCallback(async (id) => {
     setIsLoading(true);
@@ -125,7 +117,7 @@ function useTodos() {
         body: JSON.stringify({
           todo: text.trim(),
           completed: false,
-          userId: 1, //додавання симулюється
+          userId: 1,
         }),
       });
       if (!res.ok) throw new Error(`POST failed: ${res.status}`);
@@ -142,29 +134,30 @@ function useTodos() {
     t.todo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-    return {
-      
-    todos: filteredTodos,
+  const totalTodos = filteredTodos.length;
+  const startIndex = (currentPage - 1) * limitPerPage;
+  const pagedTodos = filteredTodos.slice(startIndex, startIndex + limitPerPage);
+
+  return {
+    todos: pagedTodos,
     isLoading,
     error,
-    
+
     deleteTodo,
     toggleTodo,
     addTodo,
     editTodoTitle,
-    
+
     searchTerm,
     setSearchTerm,
-    
+
     currentPage,
     limitPerPage,
     totalTodos,
     goToNextPage,
     goToPrevPage,
     setLimit: changeLimit,
-
   };
-
 }
 
 export default useTodos;
