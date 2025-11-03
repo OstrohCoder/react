@@ -1,6 +1,7 @@
+import React from "react";
 import TodoItem from "../TodoItem/TodoItem";
 
-function TodoList({ todos, onToggle, onDelete, onEdit }) {
+const TodoList = React.memo(function TodoList({ todos, onToggle, onDelete, onEdit }) {
   return (
     <ul>
       {todos.map((todo) => (
@@ -14,6 +15,6 @@ function TodoList({ todos, onToggle, onDelete, onEdit }) {
       ))}
     </ul>
   );
-}
+});
 
 export default TodoList;

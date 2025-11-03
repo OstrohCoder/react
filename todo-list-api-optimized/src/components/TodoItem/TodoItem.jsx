@@ -1,7 +1,7 @@
+import React, { useState } from "react";
 import "./TodoItem.css";
-import { useState } from "react";
 
-export default function TodoItem({ todo, onToggle, onDelete, onEdit }) {
+function TodoItem({ todo, onToggle, onDelete, onEdit }) {
   const [completed, setCompleted] = useState(Boolean(todo.completed));
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -75,3 +75,5 @@ export default function TodoItem({ todo, onToggle, onDelete, onEdit }) {
     </li>
   );
 }
+
+export default React.memo(TodoItem);

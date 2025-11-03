@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo  } from "react";
 
 const API_BASE = "https://dummyjson.com";
 
@@ -130,13 +130,18 @@ function useTodos() {
     }
   }, []);
 
-  const filteredTodos = todos.filter((t) =>
-    t.todo.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTodos = useMemo(() => {
+    return todos.filter((t) =>
+      t.todo.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [todos, searchTerm]);
 
   const totalTodos = filteredTodos.length;
-  const startIndex = (currentPage - 1) * limitPerPage;
-  const pagedTodos = filteredTodos.slice(startIndex, startIndex + limitPerPage);
+
+  const pagedTodos = useMemo(() => {
+    const startIndex = (currentPage - 1) * limitPerPage;
+    return filteredTodos.slice(startIndex, startIndex + limitPerPage);
+  }, [filteredTodos, currentPage, limitPerPage]);
 
   return {
     todos: pagedTodos,

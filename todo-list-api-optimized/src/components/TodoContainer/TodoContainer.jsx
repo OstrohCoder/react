@@ -2,6 +2,7 @@ import "../TodoList/TodoList.css";
 import useTodos from "../../hooks/useTodos";
 import TodoForm from "../TodoForm/TodoForm";
 import TodoList from "../TodoList/TodoList";
+import { useCallback } from "react";
 
 function TodoContainer() {
   const {
@@ -22,6 +23,11 @@ function TodoContainer() {
     setLimit,
   } = useTodos();
 
+  const handleSearchChange = useCallback(
+    (e) => setSearchTerm(e.target.value),
+    [setSearchTerm]
+  );
+
   return (
     <div className="todo-list-container">
       <h1>Todos</h1>
@@ -30,7 +36,7 @@ function TodoContainer() {
         type="text"
         placeholder="Search todos..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleSearchChange}
         style={{ marginBottom: "1rem", padding: "0.4rem" }}
       />
 
