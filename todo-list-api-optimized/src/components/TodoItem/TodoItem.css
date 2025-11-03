@@ -1,0 +1,28 @@
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.todo-item label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.todo-item span {
+  color: #111;
+}
+
+.todo-item.completed span {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.todo-actions button {
+  margin-left: 6px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
