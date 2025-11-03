@@ -34,6 +34,10 @@ function useTodos() {
     };
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const goToNextPage = useCallback(() => {
     setCurrentPage((prev) => prev + 1);
   }, []);
